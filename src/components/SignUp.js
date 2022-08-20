@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { auth } from "../firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "@firebase/auth";
+import { useUserContext } from "../context/userContext";
+import { update } from "@firebase/database";
 
 // use yup package for validation
 const schema = yup.object().shape({
@@ -26,7 +30,7 @@ const schema = yup.object().shape({
     .required("Please re-enter to confirm your password."),
 });
 
-const SignUp = () => {
+const SignUp = ({ toggleSignUpPage }) => {
   const {
     register,
     handleSubmit,
@@ -35,8 +39,28 @@ const SignUp = () => {
     resolver: yupResolver(schema),
   });
 
+  const { user, setUser } = useUserContext();
+
   const onSubmit = (data) => {
     console.log({ data });
+
+    createUserWithEmailAndPassword(auth, data.email, data.password)
+      .then(async (userCredential) => {
+        console.log("user has signed up");
+        const user = userCredential.user;
+        setUser(user);
+        try {
+          await updateProfile(user, { displayName: data.username });
+          console.log("username/displayname updated");
+        } catch (error) {
+          console.log(error);
+        }
+      })
+      .catch((error) => {
+        console.log("sign up failed");
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
   };
 
   return (
@@ -56,6 +80,8 @@ const SignUp = () => {
         <p>{errors.password2?.message}</p>
         <input type="submit" />
       </form>
+      <p>Already have an account?</p>
+      <button onClick={toggleSignUpPage}>SIGN IN NOW</button>
     </div>
   );
 };

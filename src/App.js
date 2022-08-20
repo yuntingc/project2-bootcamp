@@ -1,20 +1,57 @@
-import React from "react";
-import logo from "./logo.png";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 
-class App extends React.Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-        </header>
-      </div>
-    );
-  }
-}
+import { useUserContext } from "./context/userContext";
+import SignUp from "./components/SignUp";
+import Login from "./components/Login";
+import Home from "./components/Home";
+
+import { getAuth, onAuthStateChanged } from "@firebase/auth";
+import { auth } from "./firebase";
+
+const App = () => {
+  const { user, setUser } = useUserContext();
+  const [displayLogin, setDisplayLogin] = useState();
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const uid = user.uid;
+        console.log("user logged in", user);
+      } else {
+        console.log("user signed out / not logged in");
+        setUser("");
+      }
+    });
+  }, []);
+
+  const signOut = () => {
+    auth.signOut();
+  };
+
+  const toggleLoginPage = () => {
+    console.log("switch to Sign Up page", displayLogin);
+    setDisplayLogin(false);
+  };
+
+  const toggleSignUpPage = () => {
+    console.log("switch to login page", displayLogin);
+    setDisplayLogin(true);
+  };
+
+  return (
+    <div className="App">
+      <h1>Next Meet Up</h1>
+      {user ? (
+        <Home />
+      ) : displayLogin ? (
+        <Login toggleLoginPage={toggleLoginPage} />
+      ) : (
+        <SignUp toggleSignUpPage={toggleSignUpPage} />
+      )}
+      {user && <button onClick={signOut}>Sign Out</button>}
+    </div>
+  );
+};
 
 export default App;
