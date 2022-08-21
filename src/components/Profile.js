@@ -50,12 +50,12 @@ const Profile = () => {
     }
   };
 
-  const confirmProfilePic = () => {
+  const confirmProfilePic = async () => {
     // set a state for loading so that user cannot cancel/save profile in the middle
 
     setLoading(true);
 
-    uploadBytes(profilePicsRef, file).then(() => {
+    await uploadBytes(profilePicsRef, file).then(() => {
       getDownloadURL(profilePicsRef).then((fileURL) => {
         setProfilePicURL(fileURL);
         setLoading(false);
@@ -78,11 +78,14 @@ const Profile = () => {
 
   const toggleEditProfile = () => {
     setIsEditing(!isEditing);
-    setCurrentPic(user.photoURL);
-    setCurrentUsername(user.displayName);
+
+    if (isEditing) {
+      setCurrentPic(user.photoURL);
+      setCurrentUsername(user.displayName);
+    }
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {}, [user]);
 
   const handleChangeUsername = (e) => {
     setCurrentUsername(e.target.value);
@@ -122,6 +125,7 @@ const Profile = () => {
                 placeholder="Enter New username"
                 {...register("username")}
                 onChange={handleChangeUsername}
+                defaultValue={currentUsername}
               ></input>
               <p>{errors.username?.message}</p>
               <h3>Email : {user.email}</h3>{" "}

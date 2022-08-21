@@ -13,11 +13,14 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import { useUserContext } from "../context/userContext";
+import { Link } from "react-router-dom";
+import { getAuth, onAuthStateChanged } from "@firebase/auth";
+import { auth } from "../firebase";
 
 const pages = ["Home", "Groups", "Calendar"];
 const settings = ["Profile", "Logout"];
 
-const Navbar = () => {
+const Navbar = ({ signOut }) => {
   //nav bar handles
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -33,12 +36,32 @@ const Navbar = () => {
     setAnchorElNav(null);
   };
 
-  const handleCloseUserMenu = () => {
+  const handleCloseUserMenu = (e) => {
     setAnchorElUser(null);
+    console.log(e);
+
+    // if sign out button is clicked, then run the signout function
+    if (e.target.id === "logout") {
+      signOut();
+    }
   };
 
   // start of code
   const { user } = useUserContext();
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in, see docs for a list of available properties
+        // https://firebase.google.com/docs/reference/js/firebase.User
+        const uid = user.uid;
+        // ...
+      } else {
+        // User is signed out
+        // ...
+      }
+    });
+  }, []);
 
   return (
     <AppBar position="static">
@@ -48,13 +71,18 @@ const Navbar = () => {
             <Box>
               <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
                 {pages.map((page) => (
-                  <Button
-                    key={page}
-                    onClick={handleCloseNavMenu}
-                    sx={{ my: 2, color: "white", display: "block" }}
+                  <Link
+                    to={page.toLowerCase()}
+                    style={{ textDecoration: "none" }}
                   >
-                    {page}
-                  </Button>
+                    <Button
+                      key={page}
+                      onClick={handleCloseNavMenu}
+                      sx={{ my: 2, color: "white", display: "block" }}
+                    >
+                      {page}
+                    </Button>
+                  </Link>
                 ))}
               </Box>
               <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -88,7 +116,12 @@ const Navbar = () => {
                 >
                   {pages.map((page) => (
                     <MenuItem key={page} onClick={handleCloseNavMenu}>
-                      <Typography textAlign="center">{page}</Typography>
+                      <Link
+                        to={page.toLowerCase()}
+                        style={{ textDecoration: "none", color: "black" }}
+                      >
+                        <Typography textAlign="center">{page}</Typography>
+                      </Link>
                     </MenuItem>
                   ))}
                 </Menu>
@@ -109,7 +142,6 @@ const Navbar = () => {
             variant="h5"
             noWrap
             component="a"
-            href=""
             sx={{
               mr: 2,
               display: { xs: "flex", md: "flex" },
@@ -151,7 +183,7 @@ const Navbar = () => {
                   mr: 1,
                 }}
               >
-                {user.displayName.toUpperCase()}
+                {user.displayName}
               </Box>
               <Box>
                 <Tooltip title="Open settings">
@@ -178,7 +210,14 @@ const Navbar = () => {
               >
                 {settings.map((setting) => (
                   <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                    <Typography textAlign="center">{setting}</Typography>
+                    <Link
+                      to={setting.toLowerCase()}
+                      style={{ textDecoration: "none", color: "black" }}
+                    >
+                      <Typography textAlign="center" id={setting.toLowerCase()}>
+                        {setting}
+                      </Typography>
+                    </Link>
                   </MenuItem>
                 ))}
               </Menu>

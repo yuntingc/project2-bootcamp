@@ -6,6 +6,7 @@ import { auth } from "../firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "@firebase/auth";
 import { useUserContext } from "../context/userContext";
 import { update } from "@firebase/database";
+import { Link } from "react-router-dom";
 
 // use yup package for validation
 const schema = yup.object().shape({
@@ -41,14 +42,14 @@ const SignUp = ({ toggleSignUpPage }) => {
 
   const { user, setUser } = useUserContext();
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     console.log({ data });
 
-    createUserWithEmailAndPassword(auth, data.email, data.password)
+    await createUserWithEmailAndPassword(auth, data.email, data.password)
       .then(async (userCredential) => {
         console.log("user has signed up");
         const user = userCredential.user;
-        setUser(user);
+        await setUser(user);
         try {
           await updateProfile(user, { displayName: data.username });
           console.log("username/displayname updated");
@@ -81,7 +82,9 @@ const SignUp = ({ toggleSignUpPage }) => {
         <input type="submit" />
       </form>
       <p>Already have an account?</p>
-      <button onClick={toggleSignUpPage}>SIGN IN NOW</button>
+      <Link to="../login" onClick={toggleSignUpPage}>
+        SIGN IN NOW
+      </Link>
     </div>
   );
 };

@@ -1,15 +1,15 @@
+import { useEffect } from "react";
 import { useUserContext } from "../context/userContext";
+import Profile from "./Profile";
+
+import Navbar from "./Navbar";
 
 const Home = () => {
   const { user } = useUserContext();
 
-  return (
-    <div>
-      {/* Note: displayName is not shown when user first enters via the signup page */}
-      <h1>Welcome {user.displayName}!!</h1>
-      <p>THIS IS THE HOME PAGE!!</p>
-    </div>
-  );
+  useEffect(() => {}, [user.displayName]);
+
+  return <div>HOME PAGE</div>;
 };
 
 export default Home;

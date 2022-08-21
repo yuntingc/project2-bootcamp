@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useUserContext } from "../context/userContext";
 import { auth } from "../firebase";
-import { signInWithEmailAndPassword } from "@firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  setPersistence,
+  browserSessionPersistence,
+} from "@firebase/auth";
+import { Link } from "react-router-dom";
 
 const Login = ({ toggleLoginPage }) => {
   const { register, handleSubmit } = useForm();
@@ -34,7 +39,9 @@ const Login = ({ toggleLoginPage }) => {
       </form>
       {wrongLoginMessage}
       <p>New User?</p>
-      <button onClick={toggleLoginPage}>SIGN UP NOW</button>
+      <Link to="../signup" onClick={toggleLoginPage}>
+        SIGN UP NOW
+      </Link>
     </div>
   );
 };
