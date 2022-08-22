@@ -9,6 +9,8 @@ import Navbar from "./components/Navbar";
 import LoggedOutLayout from "./navigation/LoggedOutLayout";
 import LoggedInLayout from "./navigation/LoggedInLayout";
 import Profile from "./components/Profile";
+import EditProfile from "./components/EditProfile";
+
 import Groups from "./components/Groups";
 import Calendar from "./components/Calendar";
 
@@ -84,10 +86,10 @@ const App = () => {
 
         <Route element={<LoggedInLayout />}>
           <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/edit" element={<EditProfile />} />
           <Route path="/groups" element={<Groups />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/logout" element={<Login />} />
-
           <Route path="/home" element={<Home />} />
           <Route path="/" element={<Home />} />
         </Route>
