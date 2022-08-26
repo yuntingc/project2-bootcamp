@@ -1,22 +1,21 @@
-import React, { useEffect, useState } from "react";
 import "./App.css";
-
+import React, { useEffect, useState } from "react";
 import { useUserContext } from "./context/userContext";
+
+import LoggedOutLayout from "./navigation/LoggedOutLayout";
+import LoggedInLayout from "./navigation/LoggedInLayout";
+import Navbar from "./components/Navbar";
 import SignUp from "./components/SignUp";
 import Login from "./components/Login";
 import Home from "./components/Home";
-import Navbar from "./components/Navbar";
-import LoggedOutLayout from "./navigation/LoggedOutLayout";
-import LoggedInLayout from "./navigation/LoggedInLayout";
 import Profile from "./components/Profile";
 import EditProfile from "./components/EditProfile";
-
 import Groups from "./components/Groups";
 import Calendar from "./components/Calendar";
 
-import { getAuth, onAuthStateChanged } from "@firebase/auth";
 import { auth } from "./firebase";
-import { Route, Routes, Navigate } from "react-router-dom";
+import { onAuthStateChanged } from "@firebase/auth";
+import { Route, Routes } from "react-router-dom";
 
 const App = () => {
   const { user, setUser } = useUserContext();
@@ -26,7 +25,8 @@ const App = () => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const uid = user.uid;
-        console.log("user logged in", user);
+        console.log("user logged in");
+        //console.log("user logged in", user);
       } else {
         console.log("user signed out / not logged in");
         await setUser("");
@@ -36,6 +36,8 @@ const App = () => {
 
   const signOut = () => {
     console.log("signout", user);
+    // clear local storage used to store access token
+    localStorage.clear();
     auth.signOut();
   };
 
@@ -51,7 +53,6 @@ const App = () => {
 
   return (
     <div className="App">
-      {/* <GoogleAuth /> */}
       <Navbar signOut={signOut} />
 
       <Routes>

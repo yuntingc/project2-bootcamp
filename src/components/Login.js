@@ -2,12 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useUserContext } from "../context/userContext";
 import { auth } from "../firebase";
-import {
-  signInWithEmailAndPassword,
-  setPersistence,
-  browserSessionPersistence,
-} from "@firebase/auth";
+import { signInWithEmailAndPassword } from "@firebase/auth";
 import { Link } from "react-router-dom";
+import GoogleLogin from "./GoogleLogin";
 
 const Login = ({ toggleLoginPage }) => {
   const { register, handleSubmit } = useForm();
@@ -37,6 +34,7 @@ const Login = ({ toggleLoginPage }) => {
         <input placeholder="Enter password" {...register("password")}></input>
         <input type="submit"></input>
       </form>
+      <GoogleLogin />
       {wrongLoginMessage}
       <p>New User?</p>
       <Link to="../signup" onClick={toggleLoginPage}>
