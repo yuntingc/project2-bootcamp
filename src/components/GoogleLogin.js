@@ -6,6 +6,7 @@ import {
 } from "@firebase/auth";
 import { auth } from "../firebase";
 import { useUserContext } from "../context/userContext";
+import "../index.css";
 
 const google = window.google;
 const axios = require("axios");
@@ -50,7 +51,9 @@ const GoogleLogin = () => {
 
   return (
     <div>
-      <button onClick={signInWithGoogle}>Sign in with Google</button>
+      <button id="login-with-google-btn" onClick={signInWithGoogle}>
+        Sign in with Google
+      </button>
     </div>
   );
 };
