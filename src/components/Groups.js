@@ -1,18 +1,17 @@
-import CreateGroup from "./CreateGroup";
 import React, { useState, useEffect } from "react";
-import { database } from "../firebase";
-import { getDatabase, ref, set } from "firebase/database";
+import { ref, onChildAdded } from "firebase/database";
 import { useUserContext } from "../context/userContext";
-import { auth } from "../firebase";
-import { v4 as uuidv4 } from "uuid";
-
+import { database, auth } from "../firebase";
+import CreateGroup from "./CreateGroup";
+import EditGroup from "./EditGroup";
+import UserGroups from "./UserGroups";
+import { writeNewGroup, writeUpdateGroup } from "../utils/database";
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  getImageListItemBarUtilityClass,
 } from "@mui/material";
 
 const USERS_FOLDER_NAME = "users";
@@ -20,69 +19,114 @@ const GROUPS_FOLDER_NAME = "groups";
 
 const Groups = () => {
   const { user } = useUserContext();
+  // for forms submission
   const [dialogOpen, setDialogOpen] = useState(false);
   const [groupName, setGroupName] = useState("");
   const [members, setMembers] = useState([]);
   const [groupId, setGroupId] = useState("");
 
-  const writeUserData = () => {
-    set(ref(database, USERS_FOLDER_NAME + "/" + user.uid), {
-      groups: groupId,
-    });
-  };
+  // for forms edit
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
-  const writeGroupData = () => {
-    let membersObj = {};
-    for (const member of members) {
-      if (member in membersObj) {
-        membersObj[member] = true;
-      } else {
-        membersObj[member] = true;
-      }
-    }
-
-    console.log("membersObj", membersObj);
-
-    // save data for group name and owner
-    set(ref(database, GROUPS_FOLDER_NAME + "/" + groupId), {
-      groupName: groupName,
-      members: members,
-    });
-  };
+  // to retrieve data from database
+  const [groupsData, setGroupsData] = useState([]);
 
   const handleCloseDialog = () => {
     // this is not resetting the inputs!!!
     // however it may not matter if im using it to save to database only
+    setDialogOpen(false);
     setGroupId("");
     setGroupName("");
     setMembers([]);
     console.log(groupId);
     console.log(groupName);
     console.log(members);
-    setDialogOpen(false);
   };
 
   const handleOpenDialog = () => {
     // use new form every time dialog is opened
-    setGroupId(uuidv4());
+    //setGroupId(uuidv4());
     setMembers([auth.currentUser.email, ""]);
+    // groupname will be set in the form and group id will be set when item pushes to database
     setDialogOpen(true);
   };
 
-  const handleFormSubmit = () => {
+  const handleFormSubmit = async () => {
     // only upon pressing save, push information to database
-    writeGroupData();
-    writeUserData();
 
+    await writeNewGroup(user.uid, groupName, members);
     console.log("formSubmitted");
-    console.log(groupId);
-    console.log(groupName);
-    console.log(members);
-    setGroupId("");
+
     setDialogOpen(false);
   };
 
-  useEffect(() => {}, []);
+  const handleCloseEditDialog = () => {
+    setEditDialogOpen(false);
+  };
+
+  const handleEditFormSubmit = () => {
+    console.log("for edit form");
+    writeUpdateGroup(user.uid, groupName, members, groupId);
+    setEditDialogOpen(false);
+  };
+
+  useEffect(() => {
+    // console.log("useEffect");
+    setGroupsData("");
+    // console.log(groupsData);
+    // // get current info in database
+    // const dbRef = ref(database);
+
+    // get(child(dbRef, `users/${user.uid}/groups/`))
+    //   .then((snapshot) => {
+    //     console.log("show snapshot");
+    //     if (snapshot.exists()) {
+    //       let groups = snapshot.val(); // this returns object of groups { {key: {groupName, members: {} } } }
+    //       console.log("groups", groups);
+    //       Object.keys(groups).forEach((key) => {
+    //         setGroupsData((prev) => [
+    //           ...prev,
+    //           {
+    //             groupId: key,
+    //             groupName: groups[key].groupName,
+    //             members: groups[key].members,
+    //           },
+    //         ]);
+    //       });
+    //     } else {
+    //       console.log("No data available");
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+
+    const groups = ref(
+      database,
+      USERS_FOLDER_NAME + "/" + user.uid + "/groups"
+    );
+
+    //onChildAdded to return data for every child at the reference and every subsequent new child
+    //Add subsequent child to local component state, to initialise array for new rerender
+    onChildAdded(groups, (data) => {
+      console.log(data.key);
+      setGroupsData((prev) => [
+        ...prev,
+        {
+          groupName: data.val().groupName,
+          members: data.val().members,
+          groupId: data.key,
+        },
+      ]);
+    });
+
+    // reset states upon rendering
+    setGroupId("");
+    setGroupName("");
+    setMembers([]);
+
+    console.log(groupsData);
+  }, []);
 
   return (
     <div>
@@ -103,6 +147,30 @@ const Groups = () => {
         <DialogActions>
           <Button onClick={handleCloseDialog}>Cancel</Button>
           <Button onClick={handleFormSubmit}>Submit</Button>
+        </DialogActions>
+      </Dialog>
+      <UserGroups
+        groupsData={groupsData}
+        setEditDialogOpen={setEditDialogOpen}
+        setGroupId={setGroupId}
+        setGroupName={setGroupName}
+        setMembers={setMembers}
+      />
+
+      <Dialog open={editDialogOpen} onClose={handleCloseEditDialog}>
+        <DialogTitle> Edit Group </DialogTitle>
+        <DialogContent>
+          <EditGroup
+            setEditDialogOpen={setEditDialogOpen}
+            setGroupName={setGroupName}
+            groupName={groupName}
+            setMembers={setMembers}
+            members={members}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEditDialog}>Cancel</Button>
+          <Button onClick={handleEditFormSubmit}>Save</Button>
         </DialogActions>
       </Dialog>
     </div>

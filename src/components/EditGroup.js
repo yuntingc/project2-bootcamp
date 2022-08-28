@@ -3,7 +3,7 @@ import { auth } from "../firebase";
 import { Button, Box, TextField, Grid, FormControl } from "@mui/material";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 
-const CreateGroup = ({ members, groupName, setMembers, setGroupName }) => {
+const EditGroup = ({ setGroupName, groupName, setMembers, members }) => {
   const addMemberField = () => {
     let newMember = "";
     setMembers([...members, newMember]);
@@ -40,6 +40,7 @@ const CreateGroup = ({ members, groupName, setMembers, setGroupName }) => {
             label="Group Name"
             name="groupName"
             onChange={handleGroupNameChange}
+            defaultValue={groupName}
             value={groupName}
           />
         </Grid>
@@ -84,4 +85,4 @@ const CreateGroup = ({ members, groupName, setMembers, setGroupName }) => {
   );
 };
 
-export default CreateGroup;
+export default EditGroup;

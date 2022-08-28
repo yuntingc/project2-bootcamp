@@ -7,6 +7,9 @@ import {
 import { auth } from "../firebase";
 import { useUserContext } from "../context/userContext";
 import "../index.css";
+import { getDatabase, ref, set } from "firebase/database";
+import { database } from "../firebase";
+import { writeUserData } from "../utils/database";
 
 const google = window.google;
 const axios = require("axios");
@@ -31,9 +34,17 @@ const GoogleLogin = () => {
 
         // To switch to home page
         setUser(userInfo);
-        console.log(user);
 
         localStorage.setItem("accessToken", token);
+
+        //save user data into database
+        console.log("saving user data into database");
+        writeUserData(
+          userInfo.uid,
+          userInfo.displayName,
+          userInfo.photoURL,
+          userInfo.email
+        );
       })
       .catch((error) => {
         console.log(error);

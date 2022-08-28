@@ -8,9 +8,12 @@ import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import defaultProfilePic from "../avatars/avatar-default.png";
-import { Container, Box, TextField, Button } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
+import { Container, Box, TextField, Button, IconButton } from "@mui/material";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
+import {
+  writeUpdateProfilePicData,
+  writeUpdateUsernameData,
+} from "../utils/database";
 
 const PROFILE_PICTURE_FOLDER_NAME = "profile-pictures";
 
@@ -70,6 +73,7 @@ const EditProfile = () => {
           await updateProfile(user, {
             photoURL: fileURL,
           });
+          writeUpdateProfilePicData(user.uid, fileURL);
         });
       });
     }
@@ -77,6 +81,8 @@ const EditProfile = () => {
     await updateProfile(user, {
       displayName: data.username,
     });
+    writeUpdateUsernameData(user.uid, data.username);
+
     console.log("data", data);
 
     toggleEditProfile();

@@ -22,6 +22,11 @@ import {
 
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { getDatabase, ref, set } from "firebase/database";
+import { database } from "../firebase";
+import { writeUserData } from "../utils/database";
+
+const USERS_FOLDER_NAME = "users";
 
 // use yup package for validation
 const schema = yup.object().shape({
@@ -67,10 +72,16 @@ const SignUp = ({ toggleSignUpPage }) => {
       .then(async (userCredential) => {
         console.log("user has signed up");
         const user = userCredential.user;
+        console.log(user);
         await setUser(user);
+
         try {
           await updateProfile(user, { displayName: data.username });
           console.log("username/displayname updated");
+
+          // save user details into database - displayName, uid, email
+          console.log("saving user data into database");
+          writeUserData(user.uid, user.displayName, user.photoURL, user.email);
         } catch (error) {
           console.log(error);
         }

@@ -20,6 +20,10 @@ import {
 
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { getDatabase, ref, set } from "firebase/database";
+import { database } from "../firebase";
+
+const USERS_FOLDER_NAME = "users";
 
 const Login = ({ toggleLoginPage }) => {
   const { register, handleSubmit, errors, control } = useForm();
@@ -34,6 +38,7 @@ const Login = ({ toggleLoginPage }) => {
       .then((userCredential) => {
         const user = userCredential.user;
         setUser(user);
+
         setShowErrorMessage(false);
       })
       .catch((error) => {
