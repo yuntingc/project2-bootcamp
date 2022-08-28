@@ -17,7 +17,7 @@ import { Link } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "@firebase/auth";
 import { auth } from "../firebase";
 
-const pages = ["Home", "Groups", "Calendar"];
+const pages = ["Home", "Groups"];
 const settings = ["Profile", "Logout"];
 
 const Navbar = ({ signOut }) => {

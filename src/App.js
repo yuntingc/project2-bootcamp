@@ -11,7 +11,6 @@ import Home from "./components/Home";
 import Profile from "./components/Profile";
 import EditProfile from "./components/EditProfile";
 import Groups from "./components/Groups";
-import Calendar from "./components/Calendar";
 
 import { auth } from "./firebase";
 import { onAuthStateChanged } from "@firebase/auth";
@@ -89,7 +88,6 @@ const App = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/edit" element={<EditProfile />} />
           <Route path="/groups" element={<Groups />} />
-          <Route path="/calendar" element={<Calendar />} />
           <Route path="/logout" element={<Login />} />
           <Route path="/home" element={<Home />} />
           <Route path="/" element={<Home />} />
